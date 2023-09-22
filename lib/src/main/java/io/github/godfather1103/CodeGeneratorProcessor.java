@@ -51,7 +51,7 @@ public class CodeGeneratorProcessor extends AbstractProcessor {
                 );
                 try {
                     printLog(Diagnostic.Kind.NOTE, "开始" + msg);
-                    generatorCode(annotation, generatorAnnotation, element);
+                    generatorCode(generatorAnnotation, element);
                     printLog(Diagnostic.Kind.NOTE, "完成" + msg);
                 } catch (IOException e) {
                     printLog(Diagnostic.Kind.ERROR, "创建Mapper出错，" + e.getMessage());
@@ -65,7 +65,7 @@ public class CodeGeneratorProcessor extends AbstractProcessor {
         this.processingEnv.getMessager().printMessage(kind, msg);
     }
 
-    private void generatorCode(TypeElement annotation, MapperCodeGenerator generatorAnnotation, Element element) throws IOException {
+    private void generatorCode(MapperCodeGenerator generatorAnnotation, Element element) throws IOException {
         String sourceClass = element.toString();
         String className = !generatorAnnotation.mapperClassName().isEmpty() ? generatorAnnotation.mapperClassName() : element.getSimpleName() + "EntityConvert";
         String packageName = generatorAnnotation.mapperPackageName().isEmpty() ? sourceClass.substring(0, sourceClass.lastIndexOf(".")) : generatorAnnotation.mapperPackageName();
@@ -81,14 +81,14 @@ public class CodeGeneratorProcessor extends AbstractProcessor {
                 + "@Mapper(componentModel=\"" + generatorAnnotation.componentModel() + "\")\n"
                 + "public interface " + className + " {\n"
                 + className + " INSTANCE = Mappers.getMapper(" + className + ".class);\n"
-                + String.join("\n", makeConvertMethods(annotation, element))
+                + String.join("\n", makeConvertMethods(element))
                 + "\n}";
         writer.write(classFile);
         writer.flush();
         writer.close();
     }
 
-    private List<String> makeConvertMethods(TypeElement annotation, Element element) {
+    private List<String> makeConvertMethods(Element element) {
         List<String> methodList = new ArrayList<>(0);
         String sourceEntityClassName = element.toString();
         for (AnnotationMirror annotationMirror : element.getAnnotationMirrors()) {
@@ -110,8 +110,6 @@ public class CodeGeneratorProcessor extends AbstractProcessor {
         String mappings = "";
         for (ExecutableElement key : map.keySet()) {
             AnnotationValue value = map.get(key);
-            printLog(Diagnostic.Kind.NOTE, "key=" + key);
-            printLog(Diagnostic.Kind.NOTE, "value=" + value.getValue().toString());
             switch (key.toString()) {
                 case "targetEntityClass()":
                     targetEntityClass = value.getValue().toString();
