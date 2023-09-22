@@ -25,8 +25,10 @@ dependencies {
     testAnnotationProcessor("org.projectlombok:lombok:${property("lombok.version")}")
     implementation("org.mapstruct:mapstruct:1.5.5.Final")
     annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
+    compileOnly(project(":lib"))
     annotationProcessor(project(":lib"))
-    implementation(project(":lib"))
+    testCompileOnly(project(":lib"))
+    testAnnotationProcessor(project(":lib"))
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
