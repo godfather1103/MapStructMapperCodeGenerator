@@ -75,15 +75,21 @@ public class CodeGeneratorProcessor extends AbstractProcessor {
                         + className
         );
         Writer writer = file.openWriter();
-        String classFile = "package " + packageName + ";\n"
-                + "import org.mapstruct.factory.Mappers;\n"
-                + "import org.mapstruct.*;\n"
-                + "@Mapper(componentModel=\"" + generatorAnnotation.componentModel() + "\")\n"
-                + "public interface " + className + " {\n"
-                + className + " INSTANCE = Mappers.getMapper(" + className + ".class);\n"
-                + String.join("\n", makeConvertMethods(element))
-                + "\n}";
-        writer.write(classFile);
+        StringBuilder fileContent = new StringBuilder();
+        fileContent
+                .append("package ").append(packageName).append(";\n")
+                .append("import org.mapstruct.factory.Mappers;\n")
+                .append("import org.mapstruct.*;\n")
+                .append("@Mapper(componentModel=").append("\"").append(generatorAnnotation.componentModel()).append("\")\n")
+                .append("public interface ").append(className);
+        if (generatorAnnotation.isExtendsSerializable()) {
+            fileContent.append(" extends java.io.Serializable ");
+        }
+        fileContent.append("{\n")
+                .append(className).append(" INSTANCE = Mappers.getMapper(").append(className).append(".class);\n")
+                .append(String.join("\n", makeConvertMethods(element)))
+                .append("\n}");
+        writer.write(fileContent.toString());
         writer.flush();
         writer.close();
     }

@@ -48,4 +48,13 @@ public @interface MapperCodeGenerator {
      * @date 创建时间：2023/9/22 16:56
      */
     String componentModel() default "default";
+
+    /**
+     * 是否继承序列化接口<BR>
+     *
+     * @return 结果
+     * @author 作者: Jack Chu E-mail: chuchuanbao@gmail.com
+     * @date 创建时间：2023/9/22 18:04
+     */
+    boolean isExtendsSerializable() default false;
 }
